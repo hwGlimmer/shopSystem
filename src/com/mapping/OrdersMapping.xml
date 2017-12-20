@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    <mapper namespace="com.mapper.OrdersMapper">
+    	<resultMap type="com.bean.Orders" id="OrdersBean">
+    		<id column="t_orders_id" property="id"/>
+    		<result column="t_orders_zhuangtai" property="zhuangtai"/>
+    		<result column="t_orders_time" property="time"/>
+    		<result column="t_user_id" property="userId"/>
+    		<result column="t_total_price" property="orderPrice"/>
+    		<result column="t_address" property="address"/>
+    	</resultMap>
+    	
+    	<resultMap type="com.bean.OrdersItems" id="OrdersItemsBean">
+    		<id column="orders_items_id" property="id"/>
+    		<result column="wares_id" property="waresId"/>
+    		<result column="wares_num" property="waresNum"/>
+    		<result column="wares_price" property="waresPrice"/>
+    		<result column="orders_id" property="orderId"/>
+    	</resultMap>
+    	
+    	<!-- 添加订单 -->
+    	<insert id="addOrders" parameterType="com.bean.Orders"  useGeneratedKeys="true" keyProperty="id">
+    		insert into t_orders
+    		<trim suffixOverrides="," suffix=")" prefix="(">
+				<if test="zhuangtai != null"> t_orders_zhuangtai, </if>
+				<if test="time != null"> t_orders_time, </if>
+				<if test="userId != null"> t_user_id, </if>
+				<if test="orderPrice != null"> t_total_price, </if>
+				<if test="address != null"> t_address, </if>
+			</trim>
+
+			<trim suffixOverrides="," suffix=")" prefix="values(">
+				<if test="zhuangtai != null"> #{zhuangtai}, </if>
+				<if test="time != null"> #{time}, </if>
+				<if test="userId != null"> #{userId}, </if>
+				<if test="orderPrice != null"> #{orderPrice}, </if>
+				<if test="address != null"> #{address}, </if>
+			</trim>
+    	</insert>
+    	<!-- 修改订单 -->
+    	<update id="updateOrders" parameterType="com.bean.Orders">
+    		update t_orders 
+			<set>
+				<if test="zhuangtai != null">t_orders_zhuangtai = #{zhuangtai},</if>
+				<if test="time != null">t_orders_time = #{time},</if>
+				<if test="userId != null">t_user_id = #{userId},</if>
+				<if test="orderPrice != null">t_total_price = #{orderPrice},</if>
+				<if test="address != null">t_address = #{address},</if>
+			</set>
+			<where>
+				t_orders_id = #{id}
+			</where>
+    	</update>
+    	<!-- 添加订单详情 -->
+    	<insert id="addOrdersItems" parameterType="com.bean.OrdersItems"  useGeneratedKeys="true" keyProperty="id">
+    		insert into t_orders_items
+    		<trim suffixOverrides="," suffix=")" prefix="(">
+				<if test="waresId != null"> wares_id, </if>
+				<if test="waresNum != null"> wares_num, </if>
+				<if test="waresPrice != null"> wares_price, </if>
+				<if test="orderId != null"> orders_id, </if>
+			</trim>
+
+			<trim suffixOverrides="," suffix=")" prefix="values(">
+				<if test="waresId != null"> #{waresId}, </if>
+				<if test="waresNum != null"> #{waresNum}, </if>
+				<if test="waresPrice != null"> #{waresPrice}, </if>
+				<if test="orderId != null"> #{orderId}, </if>
+			</trim>
+    	</insert>
+    	<!-- 修改订单详情 -->
+    	<update id="updateOrdersItems" parameterType="com.bean.OrdersItems">
+    		update t_orders_items 
+			<set>
+				<if test="waresId != null">wares_id = #{waresId},</if>
+				<if test="waresNum != null">wares_num = #{waresNum},</if>
+				<if test="waresPrice != null">wares_price = #{waresPrice},</if>
+				<if test="orderId != null">orders_id = #{orderId},</if>
+			</set>
+			<where>
+				orders_items_id = #{id}
+			</where>
+    	</update>
+    	<!-- 查找订单条数 -->
+    	<select id="selectOrdersCount" parameterType="com.bean.Orders" resultType="int">
+    		select count(*) from t_orders
+    		<where>
+    			<if test="id != null">and t_orders_id = #{id}</if>
+    			<if test="zhuangtai != null">and t_orders_zhuangtai = #{zhuangtai}</if>
+				<if test="time != null">and t_orders_time = #{time}</if>
+				<if test="userId != null">and t_user_id = #{userId}</if>
+				<if test="orderPrice != null">and t_total_price = #{orderPrice}</if>
+				<if test="address != null">and t_address = #{address}</if>
+    		</where>
+    	</select>
+    	<!-- 分页查找订单 -->
+    	<select id="selectOrdersByPage" parameterType="java.util.Map" resultMap="OrdersBean">
+    		select * from t_orders
+    		<where>
+    			<if test="orders.id != null">and t_orders_id = #{orders.id}</if>
+    			<if test="orders.zhuangtai != null">and t_orders_zhuangtai = #{orders.zhuangtai}</if>
+				<if test="orders.time != null">and t_orders_time = #{orders.time}</if>
+				<if test="orders.userId != null">and t_user_id = #{orders.userId}</if>
+				<if test="orders.orderPrice != null">and t_total_price = #{orders.orderPrice}</if>
+				<if test="orders.address != null">and t_address = #{orders.address}</if>
+    		</where>
+    		limit #{startPos},#{pageSize}
+    	</select>
+    	<!-- 删除订单 -->
+    	<delete id="deleteOrders" parameterType="com.bean.Orders">
+    		delete from t_orders
+    		<where>
+    			<if test="id != null">and t_orders_id = #{id}</if>
+    			<if test="zhuangtai != null">and t_orders_zhuangtai = #{zhuangtai}</if>
+				<if test="time != null">and t_orders_time = #{time}</if>
+				<if test="userId != null">and t_user_id = #{userId}</if>
+				<if test="orderPrice != null">and t_total_price = #{orderPrice}</if>
+				<if test="address != null">and t_address = #{address}</if>
+    		</where>
+    	</delete>
+    	<!-- 删除订单详情 -->
+    	<delete id="deleteOrdersItems" parameterType="com.bean.OrdersItems">
+    		delete from t_orders_items
+    		<where>
+    			<if test="id != null">and orders_items_id = #{id}</if>
+    			<if test="waresId != null">and wares_id = #{waresId}</if>
+				<if test="waresNum != null">and wares_num = #{waresNum}</if>
+				<if test="waresPrice != null">and wares_price = #{waresPrice}</if>
+				<if test="orderId != null">and orders_id = #{orderId}</if>
+			</where>
+		</delete>
+    </mapper>

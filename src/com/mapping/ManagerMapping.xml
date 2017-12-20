@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    <mapper namespace="com.mapper.ManagerMapper">
+    	<resultMap type="com.bean.Manager" id="ManagerBean">
+    		<id column="id" property="id"/>
+    		<result column="name" property="name"/>
+    		<result column="password" property="password"/>
+    	</resultMap>
+    	
+    	<select id="selectManager" resultMap="ManagerBean" parameterType="com.bean.Manager">
+    		select * from t_manager
+    		<where>
+    			<if test="id != 0">and id = #{id}</if>
+    			<if test="name != null">and name = #{name}</if>
+    			<if test="password != null">and password = #{password}</if>
+    		</where>
+    	</select>
+    
+    </mapper>

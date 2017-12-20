@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    <mapper namespace="com.mapper.CatagoryMapper">
+    	<resultMap type="com.bean.OneCatagory" id="oneCatagoryBean">
+    		<id column="t_catagory_one_id" property="oneCatagoryId"/>
+    		<result column="catagory_one_name" property="oneCatagoryName"/>
+    	</resultMap>
+    	
+    	<select id="selectAllOneCatagory" resultMap="oneCatagoryBean">
+    		select * from t_catagory_one
+    	</select>
+    
+    	<select id="selectAllTwoCatagoryByOne" resultType="String">
+    		select catagory_two_name from t_catagory_two where catagory_one_name = #{oneCatagory};
+    	</select>
+    	
+    	<select id="selectOneCatagoryById" parameterType="int" resultType="String">
+    		select catagory_one_name from t_catagory_one where t_catagory_one_id = #{_parameter}
+    	</select>
+    	
+    	<update id="updateOneCatagory" parameterType="com.bean.OneCatagory">
+    		update t_catagory_one 
+			<set>
+				<if test="oneCatagoryName != null">catagory_one_name = #{oneCatagoryName},</if>
+			</set>
+			<where>
+				t_catagory_one_id = #{oneCatagoryId}
+			</where>
+    	</update>
+    	
+    	<select id="selectTwoCatagoryIdByname" parameterType="String" resultType="int">
+    		select t_catagory_two_id from t_catagory_two where catagory_two_name = #{_parameter}
+    	</select>
+    	
+    	<update id="updateTwoCatagory" parameterType="java.util.Map">
+    		update t_catagory_two
+    		<set>
+				<if test="twoCatagoryName != null">catagory_two_name = #{twoCatagoryName},</if>
+				<if test="oneCatagoryName != null">catagory_one_name = #{oneCatagoryName},</if> 		
+    		</set>
+    		<where>
+    			t_catagory_two_id = #{twoCatagoryId}
+    		</where>
+    	</update>
+    	
+    	<insert id="addTwoCatagory" parameterType="java.util.Map">
+    		insert into t_catagory_two
+    		<trim suffixOverrides="," suffix=")" prefix="(">
+				<if test="oneCatagoryName != null"> catagory_one_name, </if>
+				<if test="twoCatagoryName != null"> catagory_two_name, </if>
+			</trim>
+
+			<trim suffixOverrides="," suffix=")" prefix="values(">
+				<if test="oneCatagoryName != null"> #{oneCatagoryName}, </if>
+				<if test="twoCatagoryName != null"> #{twoCatagoryName}, </if>
+			</trim>
+    	</insert>
+    	
+    	<delete id="deleteTwoCatagoryById" parameterType="int">
+    		delete from t_catagory_two where t_catagory_two_id = #{_parameter}
+    	</delete>
+    	
+    	<insert id="addOneCatagory" parameterType="String">
+    		insert into t_catagory_one
+    		<trim suffixOverrides="," suffix=")" prefix="(">
+				<if test="_parameter != null"> catagory_one_name, </if>
+			</trim>
+
+			<trim suffixOverrides="," suffix=")" prefix="values(">
+				<if test="_parameter != null"> #{_parameter}, </if>
+			</trim>
+    	</insert>
+    	
+    	<delete id="deleteOneCatagoryById" parameterType="int">
+    		delete from t_catagory_one where t_catagory_one_id = #{_parameter}
+    	</delete>
+    	
+    	<delete id="deleteTwoCatagoryByOneCatagoryName" parameterType="String">
+    		delete from t_catagory_two where catagory_one_name = #{_parameter}
+    	</delete>
+    </mapper>

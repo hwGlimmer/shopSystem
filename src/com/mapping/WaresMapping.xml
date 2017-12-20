@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mapper.WaresMapper" >
+  <!--  结果映射 -->
+  <resultMap id="BaseResultMap" type="com.bean.Wares" >
+    <id column="w_id" property="wId" jdbcType="INTEGER" />
+    <result column="w_name" property="wName" jdbcType="VARCHAR" />
+    <result column="w_one_catagory" property="oneCatagoryName" jdbcType="VARCHAR" />
+    <result column="w_two_catagory" property="twoCatagoryName" jdbcType="VARCHAR"/>
+    <result column="w_price" property="wPrice" jdbcType="INTEGER" />
+    <result column="w_describe" property="wDescribe" jdbcType="VARCHAR" />
+    <result column="w_count" property="wCount" jdbcType="INTEGER" />
+    <result column="w_image" property="wImage" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <!-- 文本替换 -->
+  <sql id="Base_Column_List" >
+    w_id, w_name, w_one_catagory,w_two_catagory, w_price, w_describe, w_count, w_image
+  </sql>
+  <!-- 模糊搜索框，模糊查询 -->
+	<select id="selectSearch" parameterType="String" resultMap="BaseResultMap">
+		select  <include refid="Base_Column_List" /> from t_wares 
+		<where>
+			<if test="_parameter != null">w_name like concat('%',#{_parameter},'%') </if>
+		</where>
+		limit 4
+	</select>
+  
+   <!-- 查询所有商品，product.jsp展示需要，8个换页 -->
+   <select id="selectWaresAll" parameterType="java.util.Map" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from t_wares 
+    <where>
+		<if test="oneCatagoryName != null">
+			and w_one_catagory like CONCAT('%', #{oneCatagoryName}, '%')  
+		</if>
+		<if test="twoCatagoryName != null">
+			and w_two_catagory like CONCAT('%', #{twoCatagoryName}, '%')
+		</if>
+		<if test="waresName != null">
+			and w_name like CONCAT('%', #{waresName}, '%')
+		</if>
+		</where>
+		order by w_id
+		limit #{startPos}, #{pageSize} ;
+    </select>
+  
+  <!--  查询商品（index.jsp 推荐商品价格高的为推荐商品） -->
+  <select id="selectWaresTj" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from t_wares order by w_price desc limit 4;
+  </select>
+  
+  <!--  查询商品（index.jsp 促销商品价格高的为推荐商品） -->
+  <select id="selectWaresCX" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from t_wares order by w_price limit 4;
+  </select>
+  
+  <!-- 根据二级分类名查询商品（index.jsp 根据楼层F显示那里需要用) -->
+  <select id="selectWaresByT" parameterType="String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from t_wares where w_two_catagory = #{twoName} limit 8;
+  </select>
+  
+  <!-- 获取所有商品总数(product.jsp分页时需要用到) -->
+  <select id="getCount" parameterType="java.util.Map" resultType="Integer">
+    select count(w_id) from t_wares
+	<where>
+		<if test="oneCatagoryName != null">
+			and w_one_catagory like CONCAT('%', #{oneCatagoryName}, '%')  
+		</if>
+		<if test="twoCatagoryName != null">
+			and w_two_catagory like CONCAT('%', #{twoCatagoryName}, '%')
+		</if>
+		<if test="waresName != null">
+			and w_name like CONCAT('%', #{waresName}, '%')
+		</if>
+	</where>
+  </select>
+
+  	<!-- 根据名字分页查找商品 -->
+	<select id="selectWaresByNameAndPage" parameterType="java.util.Map" resultMap="BaseResultMap">
+		select  <include refid="Base_Column_List" /> from t_wares 
+		<where>
+			<if test="waresName != null">w_name like concat('%',#{waresName},'%') </if>
+		</where>
+		limit #{startPos},#{pageSize}
+	</select>
+	<!-- 根据商品名字动态查找数量 -->
+	<select id="selectAllCount" resultType="int" parameterType="String">
+		select count(*) from t_wares
+		<where>
+			<if test="_parameter != null">w_name like concat('%',#{_parameter},'%')</if>
+		</where>
+	</select>
+	
+	<!-- 根据商品id查询商品 -->
+	<select id="selectWaresById" parameterType="int" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from t_wares where w_id = #{_parameter}
+	</select>
+	
+	<!-- 修改商品 -->
+	<update id="updateWares" parameterType="com.bean.Wares">
+		update t_wares
+		<set>
+			<if test="wName != null">w_name = #{wName},</if>
+			<if test="oneCatagoryName != null">w_one_catagory = #{oneCatagoryName},</if>
+			<if test="twoCatagoryName != null">w_two_catagory = #{twoCatagoryName},</if>
+			<if test="wPrice != null">w_price = #{wPrice},</if>
+			<if test="wDescribe != null">w_describe = #{wDescribe},</if>
+			<if test="wCount != null">w_count = #{wCount},</if>
+			<if test="wImage != null">w_image = #{wImage},</if>
+		</set>
+		<where>
+			w_id = #{wId}
+		</where>
+	</update>
+	
+	<!-- 添加商品 -->
+	<insert id="addWares" parameterType="com.bean.Wares" useGeneratedKeys="true" keyProperty="wId">
+		insert into t_wares
+		<trim suffixOverrides="," suffix=")" prefix="(">
+			<if test="wName != null"> w_name, </if>
+			<if test="oneCatagoryName != null"> w_one_catagory, </if>
+			<if test="twoCatagoryName != null"> w_two_catagory, </if>
+			<if test="wPrice != null"> w_price, </if>
+			<if test="wDescribe != null"> w_describe, </if>
+			<if test="wCount != null"> w_count, </if>
+			<if test="wImage != null"> w_image, </if>
+		</trim>
+
+		<trim suffixOverrides="," suffix=")" prefix="values(">
+			<if test="wName != null"> #{wName},</if>
+			<if test="oneCatagoryName != null"> #{oneCatagoryName},</if>
+			<if test="twoCatagoryName != null"> #{twoCatagoryName},</if>
+			<if test="wPrice != null"> #{wPrice},</if>
+			<if test="wDescribe != null"> #{wDescribe},</if>
+			<if test="wCount != null"> #{wCount},</if>
+			<if test="wImage != null"> #{wImage},</if>
+		</trim>
+	</insert>
+	
+	<!-- 删除商品 -->
+	<delete id="deleteWares" parameterType="int">
+		delete from t_wares where w_id = #{_parameter}
+	</delete>
+	
+	<!-- 无条件查询所有商品 -->
+	<select id="selectAllWaresByNo" resultMap="BaseResultMap">
+		select * from t_wares
+	</select>
+</mapper>

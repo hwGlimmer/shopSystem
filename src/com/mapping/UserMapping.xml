@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper.UserMapper">
+
+	<resultMap type="com.bean.User" id="UserBean">
+		<id column="user_id" property="id" />
+		<result column="user_nick_name" property="userName" />
+		<result column="user_pwd" property="userPwd" />
+		<result column="user_true_name" property="trueName" />
+		<result column="user_tel" property="tel" />
+		<result column="user_id_number" property="idNumber" />
+		<result column="user_address" property="address" />
+	</resultMap>
+	
+	<resultMap type="com.bean.ShopAddress" id="AddressBean">
+		<id column="id" property="id"/>
+		<result column="recipients" property="recipients"/>
+		<result column="tel" property="tel"/>
+		<result column="address" property="address"/>
+		<result column="user_id" property="userId"/>
+	</resultMap>
+
+	<insert id="addUser" parameterType="com.bean.User">
+		insert into t_vip_user
+		<trim suffixOverrides="," suffix=")" prefix="(">
+			<if test="userName != null"> user_nick_name, </if>
+			<if test="userPwd != null"> user_pwd, </if>
+			<if test="trueName != null"> user_true_name, </if>
+			<if test="tel != null"> user_tel, </if>
+			<if test="idNumber != null"> user_id_number, </if>
+			<if test="address != null"> user_address, </if>
+		</trim>
+
+		<trim suffixOverrides="," suffix=")" prefix="values(">
+			<if test="userName != null"> #{userName}, </if>
+			<if test="userPwd != null"> #{userPwd}, </if>
+			<if test="trueName != null"> #{trueName}, </if>
+			<if test="tel != null"> #{tel}, </if>
+			<if test="idNumber != null"> #{idNumber}, </if>
+			<if test="address != null"> #{address}, </if>
+		</trim>
+	</insert>
+	
+	<select id="selectUserByUser" parameterType="com.bean.User" resultMap="UserBean">
+		select * from t_vip_user
+		<where>
+			<if test="id != 0">and user_id = #{id}</if>
+			<if test="userName != null">and user_nick_name = #{userName}</if>
+			<if test="userPwd != null">and user_pwd = #{userPwd}</if>
+			<if test="trueName != null">and user_true_name = #{trueName}</if>
+			<if test="tel != null">and user_tel = #{tel}</if>
+			<if test="idNumber != null">and user_id_number = #{idNumber}</if>
+			<if test="address != null">and user_address = #{address}</if>
+		</where>
+	</select>
+	
+	<select id="selectUserByName" parameterType="String" resultMap="UserBean">
+		select * from t_vip_user where user_nick_name = #{_paramter}
+	</select>
+	
+	<update id="updateUserInfo" parameterType="com.bean.User">
+		update t_vip_user
+		<set>
+			<if test="userName != null">user_nick_name = #{userName},</if>
+			<if test="userPwd != null">user_pwd = #{userPwd},</if>
+			<if test="trueName != null">user_true_name = #{trueName},</if>
+			<if test="tel != null">user_tel = #{tel},</if>
+			<if test="idNumber != null">user_id_number = #{idNumber},</if>
+			<if test="address != null">user_address = #{address},</if>
+		</set>
+		<where>
+			user_id = #{id}
+		</where>
+	</update>
+	
+	<select id="selectAddressByUserId" parameterType="int" resultMap="AddressBean">
+		select * from t_vip_shop_address where user_id = #{_parameter}
+	</select>
+	
+	<select id="selectAddressById" parameterType="int" resultMap="AddressBean">
+		select * from t_vip_shop_address where id = #{_parameter}
+	</select>
+	
+	<update id="updateAddress" parameterType="com.bean.ShopAddress">
+		update t_vip_shop_address
+		<set>
+			<if test="recipients != null">recipients = #{recipients},</if>
+			<if test="tel != null">tel = #{tel},</if>
+			<if test="address != null">address = #{address},</if>
+		</set>
+		<where>
+			id = #{id}
+		</where>
+	</update>
+	
+	<delete id="deleteAddressById" parameterType="int">
+		delete from t_vip_shop_address where id = #{_parameter}
+	</delete>
+	
+	<insert id="addShopAddress" parameterType="com.bean.ShopAddress">
+		insert into t_vip_shop_address
+		<trim suffixOverrides="," suffix=")" prefix="(">
+			<if test="recipients != null"> recipients,</if>
+			<if test="tel != null"> tel,</if>
+			<if test="address != null"> address,</if>
+			<if test="userId != null"> user_id,</if>
+		</trim>
+
+		<trim suffixOverrides="," suffix=")" prefix="values(">
+			<if test="recipients != null"> #{recipients}, </if>
+			<if test="tel != null"> #{tel}, </if>
+			<if test="address != null"> #{address}, </if>
+			<if test="userId != null"> #{userId}</if>
+		</trim>
+	</insert>
+	
+	<select id="selectAllUser" resultMap="UserBean">
+		select * from t_vip_user
+	</select>
+</mapper>
